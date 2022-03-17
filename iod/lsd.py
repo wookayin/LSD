@@ -5,7 +5,7 @@ from iod import sac_utils
 from iod.iod import IOD
 import copy
 
-from iod.utils import get_torch_concat_obs
+from iod.utils import get_torch_concat_obs, object_array
 
 
 class LSD(IOD):
@@ -140,7 +140,7 @@ class LSD(IOD):
         for key, value in samples.items():
             if value.shape[1] == 1:
                 value = np.squeeze(value, axis=1)
-            data[key] = np.asarray([torch.from_numpy(value).float().to(self.device)], dtype=np.object)
+            data[key] = object_array([torch.from_numpy(value).float().to(self.device)], dtype=np.object)
         data['valids'] = [self._trans_minibatch_size]
         self._compute_reward(data)
 
@@ -350,7 +350,7 @@ class LSD(IOD):
                 })
             rewards = rewards.split(v['valids'], dim=0)
 
-            data['rewards'] = np.asarray(rewards, dtype=np.object)
+            data['rewards'] = object_array(rewards, dtype=np.object)
 
     def _prepare_for_evaluate_policy(self, runner):
         return {}

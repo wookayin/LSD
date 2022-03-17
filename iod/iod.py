@@ -13,7 +13,7 @@ from garage.np.algos.rl_algorithm import RLAlgorithm
 from garagei import log_performance_ex
 from garagei.torch.optimizers.optimizer_group_wrapper import OptimizerGroupWrapper
 from garagei.torch.utils import compute_total_norm, TrainContext
-from iod.utils import draw_2d_gaussians, get_option_colors, FigManager, MeasureAndAccTime, record_video
+from iod.utils import draw_2d_gaussians, get_option_colors, FigManager, MeasureAndAccTime, record_video, object_array
 
 
 class IOD(RLAlgorithm):
@@ -363,29 +363,29 @@ class IOD(RLAlgorithm):
         r"""Process sample data based on the collected paths."""
         def _to_torch_float32(x):
             if x.dtype == np.object:
-                return np.array([torch.tensor(i, dtype=torch.float32, device=self.device) for i in x], dtype=np.object)
+                return object_array([torch.tensor(i, dtype=torch.float32, device=self.device) for i in x], dtype=np.object)
             return torch.tensor(x, dtype=torch.float32, device=self.device)
 
         valids = np.asarray([len(path['actions'][:self._cur_max_path_length]) for path in paths])
-        obs = np.asarray(
+        obs = object_array(
             [_to_torch_float32(path['observations'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
-        ori_obs = np.asarray(
+        ori_obs = object_array(
             [_to_torch_float32(path['env_infos']['ori_obs'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
-        next_obs = np.asarray(
+        next_obs = object_array(
             [_to_torch_float32(path['next_observations'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
-        next_ori_obs = np.asarray(
+        next_ori_obs = object_array(
             [_to_torch_float32(path['env_infos']['next_ori_obs'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
-        actions = np.asarray(
+        actions = object_array(
             [_to_torch_float32(path['actions'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
-        rewards = np.asarray(
+        rewards = object_array(
             [_to_torch_float32(path['rewards'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
-        dones = np.asarray(
+        dones = object_array(
             [_to_torch_float32(path['dones'][:self._cur_max_path_length])
              for path in paths], dtype=np.object)
 
@@ -408,7 +408,7 @@ class IOD(RLAlgorithm):
         )
 
         for key in paths[0]['agent_infos'].keys():
-            data[key] = np.asarray([torch.tensor(path['agent_infos'][key][:self._cur_max_path_length],
+            data[key] = object_array([torch.tensor(path['agent_infos'][key][:self._cur_max_path_length],
                                                  dtype=torch.float32, device=self.device)
                                     for path in paths], dtype=np.object)
         for key in ['step_xi', 'option']:

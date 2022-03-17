@@ -487,3 +487,13 @@ def compute_traj_batch_performance(batch, discount):
         undiscounted_returns=undiscounted_returns,
         discounted_returns=[rtn[0] for rtn in returns],
     )
+
+def object_array(lst, dtype):
+    # np.asarray(..., dtype=np.object) behaves differently if elements are array-like
+    # From numpy 1.20+, copy will occur when elements of lst is an array-like (e.g., cuda tensor).
+    # https://numpy.org/devdocs/release/1.20.0-notes.html#array-coercion-restructure
+    assert dtype is np.object
+    arr = np.empty(len(lst), dtype=np.object)
+    for i, t in enumerate(lst):
+        arr[i] = t
+    return arr
